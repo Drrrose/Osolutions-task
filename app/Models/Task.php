@@ -23,6 +23,8 @@ class Task extends Model
         'due_date' => 'date',
         'completed' => 'boolean',
         'priority' => TaskPriority::class,
+        'updated_at' => 'datetime',
+        'created_at' => 'datetime',
     ];
 
 
