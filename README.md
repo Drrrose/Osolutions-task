@@ -1,59 +1,184 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Osol Task API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A robust RESTful API for managing tasks and categories, built with Laravel. This application provides a backend service to create, read, update, and delete tasks, organize them into categories, and filter them based on priority and completion status.
 
-## About Laravel
+## Table of Contents
+- [Setup Instructions](#setup-instructions)
+- [Environment Configuration](#environment-configuration)
+- [API Documentation](#api-documentation)
+- [Database Design](#database-design)
+- [Assumptions](#assumptions)
+- [Testing](#testing)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Setup Instructions
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Follow these steps to get the project up and running on your local machine.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Prerequisites
+- PHP >= 8.2
+- Composer
+- MySQL or compatible database
 
-## Learning Laravel
+### Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Drrrose/Osolutions-task
+   cd Osolutions
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Install Dependencies:**
+   ```bash
+   composer install
+   ```
 
-## Laravel Sponsors
+3. **Environment Setup:**
+   Copy the example environment file to create your local configuration.
+   ```bash
+   cp .env.example .env
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. **Generate Application Key:**
+   ```bash
+   php artisan key:generate
+   ```
 
-### Premium Partners
+5. **Configure Database & Token:**
+   Open the `.env` file and update your database credentials and the API authentication token.
+   ```ini
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=your_database_name
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+   # Set your static API Token here
+   TOKEN=my-secret-token-123
+   ```
 
-## Contributing
+6. **Run Migrations and Seeders:**
+   Create the database tables and populate them with initial data.
+   ```bash
+   php artisan migrate --seed
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+7. **Start the Server:**
+   ```bash
+   php artisan serve
+   ```
+   The API will be accessible at `http://localhost:8000/api`.
 
-## Code of Conduct
+## Environment Configuration
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+The application relies on standard Laravel `.env` configuration. Key custom variables include:
 
-## Security Vulnerabilities
+*   **`TOKEN`**: A static string used for Bearer Token authentication. This must match the token sent in the `Authorization` header of your requests.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## API Documentation
 
-## License
+The API adheres to RESTful principles. All responses are in JSON format.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Authentication
+All endpoints require a Bearer Token.
+**Header:** `Authorization: Bearer <your-configured-token>`
+
+### Endpoints
+
+#### Categories
+
+*   **List Categories**
+    *   `GET /categories`
+    *   Returns a list of all available task categories.
+
+*   **Get Single Category**
+    *   `GET /categories/{id}`
+    *   Returns details for a specific category.
+
+#### Tasks
+
+*   **List Tasks**
+    *   `GET /tasks`
+    *   **Query Parameters:**
+        *   `priority` (optional): Filter by priority (e.g., `high`, `medium`, `low`).
+        *   `completed` (optional): Filter by status (`1` for completed, `0` for pending).
+    *   **Example:** `GET /tasks?priority=high&completed=0`
+
+*   **Create Task**
+    *   `POST /tasks`
+    *   **Body (JSON):**
+        ```json
+        {
+            "title": "Finish Backend Assessment",
+            "description": "Write documentation and generate postman collection",
+            "priority": "high",
+            "category_id": 1,
+            "due_date": "2025-12-30"
+        }
+        ```
+
+*   **Get Single Task**
+    *   `GET /tasks/{id}`
+    *   Returns details for a specific task.
+
+*   **Update Task**
+    *   `PATCH /tasks/{id}`
+    *   **Body (JSON):**
+        ```json
+        {
+            "title": "Update: Finished Assessment",
+            "completed": true
+        }
+        ```
+
+*   **Delete Task**
+    *   `DELETE /tasks/{id}`
+    *   Removes a task permanently.
+
+## Database Design
+
+The database consists of two primary tables to manage the core logic:
+
+1.  **`categories`**
+    *   `id`: Primary Key.
+    *   `name`: Name of the category (e.g., Work, Personal).
+    *   `color`: Hex code or string for UI display.
+    *   `icon_url`: URL for category icon.
+    *   `image_filter` & `image_seed_offset`: Used for frontend image generation/display logic.
+
+2.  **`tasks`**
+    *   `id`: Primary Key.
+    *   `title`: Short title of the task.
+    *   `description`: Detailed explanation.
+    *   `priority`: String value (e.g., "high", "medium").
+    *   `category_id`: Foreign Key referencing `categories(id)`.
+    *   `due_date`: Date when the task is due.
+    *   `completed`: Boolean status (`0` or `1`).
+    *   `image_url`: Optional image attachment.
+
+**Relationships:**
+*   A **Category** has many **Tasks**.
+*   A **Task** belongs to one **Category**.
+
+## Assumptions
+
+*   **Authentication:** The system uses a simple static Bearer Token mechanism for authentication, suitable for service-to-service communication or simple client access, rather than a full user session/OAuth system (like Sanctum or Passport).
+*   **User Scope:** The current implementation treats tasks as global resources accessible to anyone with the valid API token. There is no `user_id` on the tasks table, implying a single-tenant or shared workspace model.
+*   **Priority:** Task priority is implemented as a simple string field allowing flexibility, rather than a strict database ENUM.
+
+## Testing
+
+### Automated Tests
+Run the included Laravel Feature and Unit tests using Artisan:
+```bash
+php artisan test
+```
+
+### Manual Testing (Postman)
+A Postman collection is included in the root directory: `Osol Task API.postman_collection.json`.
+
+1.  Open Postman.
+2.  Import the `Osol Task API.postman_collection.json` file.
+3.  Set the `base_url` collection variable to `http://localhost:8000/api`.
+4.  Set the `token` collection variable to the value you defined in your `.env` file (e.g., `my-secret-token-123`).
+5.  Run the requests to verify API functionality.
